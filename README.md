@@ -1,17 +1,24 @@
 
-# kgen (Key Gen)
+# kgen
 
-`kgen` is a keyboard layout generator and management tool. It helps you maintain your keyboard layers in a human-readable text format and builds them into firmware-specific configurations (like QMK).
+_A sophisticated keyboard layout generator and management system._
 
-## Features
+---
 
-- **Project Initialization**: Easily set up a new keyboard configuration project.
-- **Layer Formatting**: Keep your layer files organized and visually consistent.
-- **Firmware Building**: Generate firmware code for supported manufacturers.
+`kgen` (Key Gen) bridges the gap between human-readable layout design and firmware-specific configurations. It allows you to define your keyboard layers in intuitive text formats and compiles them into ready to use firmware code.
+
+## Core Capabilities
+
+*   **Declarative Configuration**
+    Manage your entire keyboard through a central `config.toml` and clean text-based layer files.
+*   **Visual Consistency**
+    Automatic formatting ensures your layer files remain readable and aligned with your physical layout.
+*   **Cross-Firmware Support**
+    Generate configurations for QMK (fully supported) and ZMK (in development).
 
 ## Installation
 
-To install `kgen` from source, clone the repository and use `cargo`:
+Building from source requires the Rust toolchain:
 
 ```bash
 git clone https://github.com/vincbro/kgen.git
@@ -19,30 +26,61 @@ cd kgen
 cargo install --path .
 ```
 
-## How It Works
 
-`kgen` operates on a project directory containing a `config.toml` and several layer files (`.txt`).
+## Technical Workflow
 
-1. **`config.toml`**: Defines the keyboard layout and the list of layers.
-2. **Layer Files**: Text files representing each layer of your keyboard. `kgen` uses these to generate the final keymap.
+`kgen` operates on a structured project directory:
 
-## CLI Usage
+1.  **`config.toml`**
+    The source of truth for your physical layout and layer definitions.
+2.  **Layer Files (`.txt`)**
+    Human-readable representations of individual keyboard layers.
 
-`kgen` provides several subcommands to manage your keyboard project.
+The tool parses these inputs to generate the final keymap logic for your target firmware.
+
+
+## Configuration (`config.toml`)
+
+The `config.toml` file defines the physical architecture of your keyboard and identifies the layers to be compiled.
+
+### Layout Definition
+
+The `layout` field uses a visual grid to define key positions. Each `#` represents a physical key, while spaces represent gaps. This grid is used by `kgen format` to generate and align your layer files.
+
+```toml
+[config]
+layout = [
+	"######     ######",
+	"######     ######",
+	"######     ######",
+	"######## ########",
+	"   ##### #####   ",
+	"####         ####",
+]
+```
+
+### Layer Management
+
+The `layers` field lists the names of your layer files (without the `.txt` extension). `kgen` expects to find a corresponding file for each entry (e.g., `base.txt`, `nav.txt`).
+
+```toml
+layers = ["base", "nav", "sym"]
+```
+
+
+## Command Reference
 
 ### `init`
 
-Initializes a new `kgen` project at the specified path.
+Initializes a new project structure with a default configuration.
 
 ```bash
 kgen init --path ./my-keyboard
 ```
 
-This creates the directory and a default `config.toml`.
-
 ### `format`
 
-Formats the layer files according to the layout defined in `config.toml`. If a layer file doesn't exist, it creates a template for it.
+Standardizes the visual layout of your layer files. If a file is missing, `kgen` generates a template based on your configuration.
 
 ```bash
 kgen format --path ./my-keyboard
@@ -50,20 +88,32 @@ kgen format --path ./my-keyboard
 
 ### `build`
 
-Builds the keymap for a specific manufacturer.
+Compiles your project into firmware-specific source code.
 
 ```bash
 kgen build --path ./my-keyboard --manufacturer qmk --output ./keymap.c
 ```
 
-#### Options:
-- `-p, --path <PATH>`: Path to the keyboard project directory.
-- `-m, --manufacturer <MANUFACTURER>`: The target firmware manufacturer (currently supported: `qmk`; `zmk` is planned). Default is `qmk`.
-- `-o, --output <OUTPUT>`: Optional path to save the generated output. If omitted, it prints to stdout.
+#### Parameters
 
-## Manufacturers
+| Option | Shorthand | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `--path` | `-p` | Path to the keyboard project directory. | Required |
+| `--manufacturer` | `-m` | Target firmware (e.g., `qmk`, `zmk`). | `qmk` |
+| `--output` | `-o` | Path to save the generated output. | `stdout` |
 
-- **QMK**: Fully supported.
-- **ZMK**: Support is currently in development.
 
-If your keyboard manufacturer is not listed, feel free to make a pull request adding it! When contributing, please follow the setup in `src/parser/qmk.rs` and ensure you add the new manufacturer to the `Manufacturers` enum.
+## Ecosystem Support
+
+### QMK Firmware
+
+`kgen` provides first-class support for QMK, translating text layers into robust C code compatible with standard QMK builds.
+
+### ZMK Firmware
+
+Support for ZMK is currently under active development.
+
+
+### Contribution
+
+To add support for a new manufacturer, please refer to the implementation patterns in `src/parser/qmk.rs` and extend the `Manufacturers` enum. Pull requests are welcome.
