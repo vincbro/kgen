@@ -71,6 +71,7 @@ fn init<P>(path: P) -> Result<(), kgen::Error>
 where
     P: AsRef<Path>,
 {
+    fs::create_dir_all(path.as_ref())?;
     let conf_path = path.as_ref().join("config.toml");
 
     if fs::exists(&conf_path)? {
