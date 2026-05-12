@@ -25,7 +25,9 @@ impl Keyboard {
             keymap_path.set_extension("txt");
             if fs::exists(&keymap_path)? {
                 let buf = fs::read_to_string(&keymap_path)?;
-                keymap.set_keymap(&buf);
+                keymap
+                    .set_keymap(&buf)
+                    .unwrap_or_else(|err| panic!("{layer} failed: {err}"));
             }
             layers.push(Layer {
                 name: layer,

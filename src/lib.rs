@@ -15,4 +15,10 @@ pub enum Error {
     Deserialize(#[from] toml::de::Error),
     #[error("parse key error: {0}")]
     ParseKey(String),
+    #[error("to many keys on line: {0}")]
+    TooManyKeys(usize),
+    #[error("to few keys on line: {0}")]
+    TooFewKeys(usize),
+    #[error("to many rows")]
+    TooManyRows,
 }

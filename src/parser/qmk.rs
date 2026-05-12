@@ -6,6 +6,10 @@ impl Keyboard {
         for layer in &self.layers {
             layers.push_str(&format!("    {},\n", layer.name.to_uppercase()));
         }
+        if layers.ends_with(",\n") {
+            layers.truncate(layers.len() - 2);
+            layers.push('\n');
+        }
 
         let mut keymaps = String::new();
         for layer in &self.layers {
@@ -21,10 +25,14 @@ impl Keyboard {
             }
 
             keymaps.push_str(&format!(
-                "    [{}] = LAYOUT_elora_hlc(\n{},\n    ),\n",
+                "    [{}] = LAYOUT_elora_hlc(\n{}\n    ),\n",
                 layer.name.to_uppercase(),
                 keys.join(",\n")
             ));
+        }
+        if keymaps.ends_with(",\n") {
+            keymaps.truncate(keymaps.len() - 2);
+            keymaps.push('\n');
         }
 
         Ok(format!(
